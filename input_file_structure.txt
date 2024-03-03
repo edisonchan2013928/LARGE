@@ -1,0 +1,11 @@
+The following input file structure is adopted by our code.
+####################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################
+[Number of data points n]
+[The x-coordinate of the starting point of the 1^{st} line segment] [The y-coordinate of the starting point of the 1^{st} line segment] [The x-coordinate of the ending point of the 1^{st} line segment] [The y-coordinate of the ending point of the 1^{st} line segment]
+[The x-coordinate of the starting point of the 2^{nd} line segment] [The y-coordinate of the starting point of the 2^{nd} line segment] [The x-coordinate of the ending point of the 2^{nd} line segment] [The y-coordinate of the ending point of the 2^{nd} line segment]
+:
+:
+:
+[The x-coordinate of the starting point of the n^{th} line segment] [The y-coordinate of the starting point of the n^{th} line segment] [The x-coordinate of the ending point of the n^{th} line segment] [The y-coordinate of the ending point of the n^{th} line segment]
+####################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################
+In the first line of the input file, we need to state the number of line segments n. Then, this file should include the coordinates of the starting point and the ending point of each line segment in the following n lines. Note that the x-coordinate of the starting point must be smaller than the x-coordinate of the ending point, which follows Definition 1.
