@@ -1,0 +1,11 @@
+The following output file structure is adopted by our code.
+####################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################
+[The x-coordinate of the 1^{st} pixel] [The y-coordinate of the 1^{st} pixel] [Line density value of the 1^{st} pixel]
+[The x-coordinate of the 2^{nd} pixel] [The y-coordinate of the 2^{nd} pixel] [Line density value of the 2^{nd} pixel]
+:
+:
+:
+[The x-coordinate of the n^{th} pixel] [The y-coordinate of the n^{th} pixel] [Line density value of the n^{th} pixel]
+####################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################
+In each line of this output file structure, we store the x-coordinate, the y-coordinate, and the line density value of each pixel.
+Our C++ code adopts the lexicographical order (where the x-coordinate has the high priority) for outputting those coordinates and their corresponding line density values.
