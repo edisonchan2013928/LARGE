@@ -1,4 +1,4 @@
-#include "SCAN_Line.h"
+#include "SCAN_line.h"
 
 void init_influence_pixels(statistics& stat)
 {
