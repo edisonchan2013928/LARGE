@@ -7,6 +7,8 @@
 const double inf = 9999999999;
 const double eps = 0.0001;
 
+//#define STATISTICS
+
 struct Pixel
 {
 	double x_min;
@@ -49,15 +51,15 @@ struct statistics
 	char* input_data_fileName; //The name of the input file
 	char* output_visual_fileName; //The name of the output file
 	int method; //method = 0: SCAN, method = 1: R* tree, method = 2: PMR Quad-tree, method = 3: LARGE
-	int query_type; //query_type = 0: epsilon-LDV, query_type = 1: tau-LDV
+	//int query_type; //query_type = 0: epsilon-LDV, query_type = 1: tau-LDV
 	Pixel** plane; //original plane
 	line_segment* ls_dataset; //line segment dataset
 	double bandwidth; //bandwidth parameter
 	//Uses this variable if query_type = 0
 	double epsilon;
 	//Uses these variables if query_type = 1
-	int num_tau; //the number of thresholds
-	vector<double> tau_vector; //the vector of thresholds
+	//int num_tau; //the number of thresholds
+	//vector<double> tau_vector; //the vector of thresholds
 
 	//boundary
 	double boundary_x_min;
@@ -75,8 +77,10 @@ struct statistics
 	//vector<int> line_id_set;
 	//bool* ls_set_select_vec;
 
-	//LARGE
+	//Used in LARGE and SCAN_Line
 	int cur_line_index;
+
+	//LARGE
 	/*int cur_x_index;
 	int cur_y_index;
 	double cur_x_value;
@@ -104,6 +108,12 @@ struct statistics
 	//arbitrary-shaped LB and UB
 	vector<int> LB_arbit_expanded_index_vec;
 	vector<int> UB_arbit_expanded_index_vec;
+
+	//SCAN_Line
+	bool** is_selected_pixel_matrix;
+	int influence_x_grid;
+	int influence_y_grid;
+	vector<pair<int, int>> influence_pixel_index_vec;
 };
 
 #endif

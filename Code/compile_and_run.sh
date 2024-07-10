@@ -1,9 +1,10 @@
 g++ -c SCAN.cpp -o SCAN.o
+g++ -c SCAN_line.cpp -o SCAN_line.o
 g++ -c R_tree.cpp -w R_tree.o
 g++ -c PMR_QUAD_Tree.cpp -w PMR_QUAD_Tree.o
 g++ -c LARGE.cpp -w LARGE.o
 g++ -c Visual.cpp -w Visual.o
-g++ main.cpp -O3 -o main SCAN.o R_tree.o PMR_QUAD_Tree.o LARGE.o Visual.o
+g++ main.cpp -O3 -o main SCAN.o SCAN_line.o R_tree.o PMR_QUAD_Tree.o LARGE.o Visual.o
 exit #Users can remove this line if they want to call our code.
 
 #stat.input_data_fileName = argv[1]; //The name of the input dataset

@@ -236,7 +236,7 @@ void obtain_line_accumulated_length(statistics& stat)
 	if (ER_cur_index_x >= stat.ER_X || ER_cur_index_y < 0 || ER_cur_index_y >= stat.ER_Y)
 		return;
 
-	//Case (1) and (2)
+	//Case (1) and Case (2)
 	if (m > 0)
 	{
 		y_coord = stat.ER_plane[ER_cur_index_x][ER_cur_index_y].y_max;
@@ -573,18 +573,21 @@ double bound_arbit(Pixel& p, statistics& stat, vector<int>& expanded_index_vec)
 
 bool check_condition(statistics& stat, Pixel& p, double LB, double UB)
 {
-	if (stat.query_type == 0)
-	{
-		if (LB == 0)
-			return false;
-
-		if (UB - LB <= stat.epsilon * (UB + LB))
-		{
-			p.density_value = (2 * LB * UB) / (LB + UB);
-			return true;
-		}
+	if (LB == 0)
 		return false;
+
+	if (UB < eps)
+	{
+		p.density_value = 0;
+		return true;
 	}
+
+	if (UB - LB <= stat.epsilon * (UB + LB))
+	{
+		p.density_value = (2 * LB * UB) / (LB + UB);
+		return true;
+	}
+	return false;
 }
 
 /*void filter_and_refinement(statistics& stat)
@@ -646,7 +649,7 @@ void filter_and_refinement(statistics& stat, R_tree& R_tree)
 	{
 		for (int y = 0;y < stat.Y;y++)
 		{
-			Pixel& p = stat.plane[x][y];
+			Pixel& p = stat.plane[x][y];	
 
 			//Filter
 			LB_rect = bound_rectangle(p, stat, true);
@@ -671,6 +674,100 @@ void filter_and_refinement(statistics& stat, R_tree& R_tree)
 		}
 	}
 }
+
+void bound_visual(statistics& stat, R_tree& R_tree)
+{
+	obtain_rectangular_mask(stat);
+	obtain_arbitrary_mask(stat);
+	if (stat.LB_expanded_index == -1) //LB must be 0
+	{
+		SCAN(stat);
+		return;
+	}
+
+	for (int x = 0;x < stat.X;x++)
+	{
+		for (int y = 0;y < stat.Y;y++)
+		{
+			Pixel& p = stat.plane[x][y];
+
+			if (stat.method == 5) //Use LB_rect
+				p.density_value = bound_rectangle(p, stat, true);
+			if (stat.method == 6) //Use UB_rect
+				p.density_value = bound_rectangle(p, stat, false);
+			if (stat.method == 7) //Use LB_arbit
+				p.density_value = bound_arbit(p, stat, stat.LB_arbit_expanded_index_vec);
+			if (stat.method == 8) //Use UB_arbit
+				p.density_value = bound_arbit(p, stat, stat.UB_arbit_expanded_index_vec);
+		}
+	}
+}
+
+//For statistical purpose
+#ifdef STATISTICS
+void filter_and_refinement_STAT(statistics& stat, R_tree& R_tree)
+{
+	double LB_rect, UB_rect;
+	double LB_arbit, UB_arbit;
+	bool filter_condition;
+	int square_counter = 0;
+	int arbitrary_counter = 0;
+	int refinement_counter = 0;
+	double square_percentage;
+	double arbitrary_percentage;
+	double refinement_percentage;
+
+	obtain_rectangular_mask(stat);
+	obtain_arbitrary_mask(stat);
+	if (stat.LB_expanded_index == -1) //LB must be 0
+	{
+		cout << "Square: 0" << endl;
+		cout << "Arbitrary: 0" << endl;
+		cout << "Refinement: 100" << endl;
+		
+		return;
+	}
+
+	for (int x = 0;x < stat.X;x++)
+	{
+		for (int y = 0;y < stat.Y;y++)
+		{
+			Pixel& p = stat.plane[x][y];
+
+			//Filter
+			LB_rect = bound_rectangle(p, stat, true);
+			UB_rect = bound_rectangle(p, stat, false);
+
+			filter_condition = check_condition(stat, p, LB_rect, UB_rect);
+			if (filter_condition == true)
+			{
+				square_counter++;
+				continue;
+			}
+
+			LB_arbit = bound_arbit(p, stat, stat.LB_arbit_expanded_index_vec);
+			UB_arbit = bound_arbit(p, stat, stat.UB_arbit_expanded_index_vec);
+
+			filter_condition = check_condition(stat, p, LB_arbit, UB_arbit);
+			if (filter_condition == true)
+			{
+				arbitrary_counter++;
+				continue;
+			}
+
+			refinement_counter++;
+		}
+	}
+
+	square_percentage = ((double)square_counter / (stat.X * stat.Y)) * 100.0;
+	arbitrary_percentage = ((double)arbitrary_counter / (stat.X * stat.Y)) * 100.0;
+	refinement_percentage = ((double)refinement_counter / (stat.X * stat.Y)) * 100.0;
+
+	cout << "Square: " << square_percentage << endl;
+	cout << "Arbitrary: " << arbitrary_percentage << endl;
+	cout << "Refinement: " << refinement_percentage << endl;
+}
+#endif
 
 //Used for debugging
 void output_LARGE(statistics& stat)

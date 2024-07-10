@@ -24,10 +24,10 @@ void R_tree::construct_ls_rect_data()
 		data_node->boundary[0] = new double[2];	data_node->boundary[1] = new double[2];
 		data_node->center = new double[2];
 
-		data_node->boundary[0][0] = ls_dataset[l].x_start;
-		data_node->boundary[0][1] = ls_dataset[l].x_end;
-		data_node->boundary[1][0] = ls_dataset[l].y_start;
-		data_node->boundary[1][1] = ls_dataset[l].y_end;
+		data_node->boundary[0][0] = min(ls_dataset[l].x_start, ls_dataset[l].x_end);
+		data_node->boundary[0][1] = max(ls_dataset[l].x_start, ls_dataset[l].x_end);
+		data_node->boundary[1][0] = min(ls_dataset[l].y_start, ls_dataset[l].y_end);
+		data_node->boundary[1][1] = max(ls_dataset[l].y_start, ls_dataset[l].y_end);
 
 		data_node->center[0] = (data_node->boundary[0][0] + data_node->boundary[0][1]) / 2.0;
 		data_node->center[1] = (data_node->boundary[1][0] + data_node->boundary[1][1]) / 2.0;

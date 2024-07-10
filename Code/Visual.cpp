@@ -123,28 +123,20 @@ void init(statistics& stat, int argc, char** argv)
 {
 	stat.input_data_fileName = argv[1];
 	stat.output_visual_fileName = argv[2];
-	stat.query_type = atoi(argv[3]);
-	stat.method = atoi(argv[4]);
-	stat.X = atoi(argv[5]);
-	stat.Y = atoi(argv[6]);
-	stat.bandwidth = atof(argv[7]);
-	if (stat.query_type == 0)
-		stat.epsilon = atof(argv[8]);
-	else
-	{
-		stat.num_tau = atoi(argv[8]);
-		for (int t = 0;t < stat.num_tau;t++)
-			stat.tau_vector.push_back(atof(argv[9 + t]));
-	}
+	stat.method = atoi(argv[3]);
+	stat.X = atoi(argv[4]);
+	stat.Y = atoi(argv[5]);
+	stat.bandwidth = atof(argv[6]);
+	stat.epsilon = atof(argv[7]);
 
 	//Debug
-	/*stat.input_data_fileName = (char*)"../../../Datasets/San_Francisco_taxi/San_Francisco_taxi_S5";
-	stat.output_visual_fileName = (char*)"./Results/San_Francisco_taxi_S5_m3_q0_X16_Y16_b1000_e0.2";
-	stat.query_type = 0;
-	stat.method = 3;
-	stat.X = 16;
-	stat.Y = 16;
-	stat.bandwidth = 1000;
+	/*stat.input_data_fileName = (char*)"../../../Datasets/Testing/Testing";
+	stat.output_visual_fileName = (char*)"./Results/Testing_m9_X8_Y5_b4_e0.2";
+	//stat.query_type = 0;
+	stat.method = 9;
+	stat.X = 8;
+	stat.Y = 5;
+	stat.bandwidth = 4;
 	stat.epsilon = 0.2;*/
 
 	load_data(stat);
@@ -187,14 +179,32 @@ void visual_algorithm(statistics& stat)
 		construct_LARGE(stat);
 		R_tree.construct_ls_rect_data();
 		R_tree.build_RTree();
-		filter_and_refinement(stat, R_tree);
+
+		#ifdef STATISTICS
+			filter_and_refinement_STAT(stat, R_tree);
+			exit(0);
+		#else
+			filter_and_refinement(stat, R_tree);
+		#endif
 	}
+
+	if (stat.method >= 5 && stat.method <= 8) //Use our bound functions for visualization
+	{
+		construct_LARGE(stat);
+		R_tree.construct_ls_rect_data();
+		R_tree.build_RTree();
+		bound_visual(stat, R_tree);
+	}
+
+	if (stat.method == 9) //SCAN_line
+		SCAN_line(stat);
 
 	auto end_s = chrono::high_resolution_clock::now();
 
-	run_time = (chrono::duration_cast<chrono::nanoseconds>(end_s - start_s).count()) / 1000000000.0;
-
-	cout << "method " << stat.method << ":" << run_time << endl;
+	#ifndef STATISTICS
+		run_time = (chrono::duration_cast<chrono::nanoseconds>(end_s - start_s).count()) / 1000000000.0;
+		cout << "method " << stat.method << ":" << run_time << endl;
+	#endif
 }
 
 void output_visual(statistics& stat)
@@ -211,7 +221,8 @@ void output_visual(statistics& stat)
 	{
 		for (int y = 0;y < stat.Y;y++)
 		{
-			output_visual_file << stat.plane[x][y].x_center << " " << stat.plane[x][y].y_center
+			//output_visual_file << stat.plane[x][y].density_value << endl; //for debugging
+			output_visual_file << setprecision(10) << stat.plane[x][y].x_center << " " << setprecision(10) << stat.plane[x][y].y_center
 				<< " " << stat.plane[x][y].density_value << endl;
 		}
 	}
